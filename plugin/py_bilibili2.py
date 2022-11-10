@@ -165,7 +165,7 @@ class Spider(Spider):  # 元类 默认的元类 type
 				"vod_name":title,
 				"vod_pic":img,
 				"vod_remarks":remark,
-				"type":1
+				"vod_type":1
 			})
         result['list'] = videos
         result['page'] = pg
@@ -177,85 +177,42 @@ class Spider(Spider):  # 元类 默认的元类 type
         return str.replace('\n','').replace('\t','').replace('\r','').replace(' ','')
     def detailContent(self,array):
         aid = array[0]
-        type = array[4]
-        if type == 1:
-            url = "http://api.bilibili.com/pgc/view/web/season?season_id={0}".format(aid)
-            rsp = self.fetch(url,headers=self.header)
-            jRoot = json.loads(rsp.text)
-            jo = jRoot['result']
-            id = jo['season_id']
-            title = jo['title']
-            pic = jo['cover']
-            areas = jo['areas'][0]['name']
-            typeName = jo['share_sub_title']
-            dec = jo['evaluate']
-            remark = jo['new_ep']['desc']
-            vod = {
-                "vod_id":id,
-                "vod_name":title,
-                "vod_pic":pic,
-                "type_name":typeName,
-                "vod_year":"",
-                "vod_area":areas,
-                "vod_remarks":remark,
-                "vod_actor":"",
-                "vod_director":"",
-                "vod_content":dec
-            }
-            ja = jo['episodes']
-            playUrl = ''
-            for tmpJo in ja:
-                eid = tmpJo['id']
-                cid = tmpJo['cid']
-                part = tmpJo['title'].replace("#", "-")
-                playUrl = playUrl + '{0}${1}_{2}#'.format(part, eid, cid)
+        url = "https://api.bilibili.com/x/web-interface/view?aid={0}".format(aid)
+        rsp = self.fetch(url,headers=self.header,cookies=self.getCookie())
+        jRoot = json.loads(rsp.text)
+        jo = jRoot['data']
+        title = jo['title'].replace("<em class=\"keyword\">","").replace("</em>","")
+        pic = jo['pic']
+        desc = jo['desc']
+        typeName = jo['tname']
+        vod = {
+            "vod_id":aid,
+            "vod_name":title,
+            "vod_pic":pic,
+            "type_name":typeName,
+            "vod_year":"",
+            "vod_area":"bilidanmu",
+            "vod_remarks":"",
+            "vod_actor":jo['owner']['name'],
+            "vod_director":jo['owner']['name'],
+            "vod_content":desc
+        }
+        ja = jo['pages']
+        playUrl = ''
+        for tmpJo in ja:
+            cid = tmpJo['cid']
+            part = tmpJo['part']
+            playUrl = playUrl + '{0}${1}_{2}#'.format(part,aid,cid)
 
-            vod['vod_play_from'] = 'B站影视'
-            vod['vod_play_url'] = playUrl
+        vod['vod_play_from'] = 'B站'
+        vod['vod_play_url'] = playUrl
 
-            result = {
-                'list':[
-                    vod
-                ]
-            }
-            return result
-        else:
-            url = "https://api.bilibili.com/x/web-interface/view?aid={0}".format(aid)
-            rsp = self.fetch(url,headers=self.header,cookies=self.getCookie())
-            jRoot = json.loads(rsp.text)
-            jo = jRoot['data']
-            title = jo['title'].replace("<em class=\"keyword\">","").replace("</em>","")
-            pic = jo['pic']
-            desc = jo['desc']
-            typeName = jo['tname']
-            vod = {
-                "vod_id":aid,
-                "vod_name":title,
-                "vod_pic":pic,
-                "type_name":typeName,
-                "vod_year":"",
-                "vod_area":"bilidanmu",
-                "vod_remarks":"",
-                "vod_actor":jo['owner']['name'],
-                "vod_director":jo['owner']['name'],
-                "vod_content":desc
-            }
-            ja = jo['pages']
-            playUrl = ''
-            for tmpJo in ja:
-                cid = tmpJo['cid']
-                part = tmpJo['part']
-                playUrl = playUrl + '{0}${1}_{2}#'.format(part,aid,cid)
-
-            vod['vod_play_from'] = 'B站'
-            vod['vod_play_url'] = playUrl
-
-            result = {
-                'list':[
-                    vod
-                ]
-            }
-            return result
+        result = {
+            'list':[
+                vod
+            ]
+        }
+        return result
     def searchContent(self,key,quick):
         search = self.categoryContent(tid=key,pg=1,filter=None,extend=None)
         result = {
