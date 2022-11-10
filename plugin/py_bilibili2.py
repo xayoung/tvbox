@@ -23,12 +23,6 @@ class Spider(Spider):  # 元类 默认的元类 type
             "动态":"动态",
             "热门":"热门",
             "排行榜":"排行榜",
-            "番剧": "1",
-			"国创": "4",
-			"电影": "2",
-			"综艺": "7",
-			"电视剧": "5",
-			"纪录片": "3"
         }
         classes = []
         for k in cateManual:
@@ -147,26 +141,29 @@ class Spider(Spider):  # 元类 默认的元类 type
             return self.get_rank()
         if tid == '动态':
             return self.get_dynamic(pg=pg)
-        url = 'https://api.bilibili.com/pgc/season/index/result?order=2&season_status=-1&style_id=-1&sort=0&area=-1&pagesize=20&type=1&st={0}&season_type={0}&page={1}'.format(tid,pg)
+        url = 'https://api.bilibili.com/x/web-interface/search/type?search_type=video&keyword={0}&page={1}'.format(tid,pg)
         if len(self.cookies) <= 0:
             self.getCookie()
-        rsp = self.fetch(url, cookies=self.cookies)
+        rsp = self.fetch(url,cookies=self.getCookie())
         content = rsp.text
         jo = json.loads(content)
+        if jo['code'] != 0:			
+            rspRetry = self.fetch(url,cookies=self.getCookie())
+            content = rspRetry.text		
+        jo = json.loads(content)
         videos = []
-        vodList = jo['data']['list']
+        vodList = jo['data']['result']
         for vod in vodList:
-            aid = str(vod['season_id']).strip()
-            title = vod['title'].strip()
-            img =  vod['cover'].strip()
-            remark = vod['index_show'].strip()
+            aid = str(vod['aid']).strip()
+            title = tid + ":" + vod['title'].strip().replace("<em class=\"keyword\">","").replace("</em>","")
+            img = 'https:' + vod['pic'].strip()
+            remark = str(vod['duration']).strip()
             videos.append({
-				"vod_id":aid,
-				"vod_name":title,
-				"vod_pic":img,
-				"vod_remarks":remark,
-				"vod_type":1
-			})
+                "vod_id":aid,
+                "vod_name":title,
+                "vod_pic":img,
+                "vod_remarks":remark
+            })
         result['list'] = videos
         result['page'] = pg
         result['pagecount'] = 9999
@@ -178,6 +175,7 @@ class Spider(Spider):  # 元类 默认的元类 type
     def detailContent(self,array):
         aid = array[0]
         url = "https://api.bilibili.com/x/web-interface/view?aid={0}".format(aid)
+
         rsp = self.fetch(url,headers=self.header,cookies=self.getCookie())
         jRoot = json.loads(rsp.text)
         jo = jRoot['data']
