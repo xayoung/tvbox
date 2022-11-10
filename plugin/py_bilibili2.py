@@ -44,7 +44,7 @@ class Spider(Spider):  # 元类 默认的元类 type
     def getCookie(self):
         import requests
         import http.cookies
-        raw_cookie_line = "buvid3=F87F0A11-46CF-848D-6DFF-E8A6FF7060A766081infoc; rpdid=|(J|~ukYY|~)0J'uYYY~lYYY~; buvid_fp=F87F0A11-46CF-848D-6DFF-E8A6FF7060A766081infoc; buvid_fp_plain=undefined; DedeUserID=131773; DedeUserID__ckMd5=54f906a0afc0ce2c; i-wanna-go-back=-1; b_ut=5; nostalgia_conf=-1; hit-dyn-v2=1; buvid4=null; b_nut=1667183288; fingerprint=c1b65158bb87079465a8da1e534826d0; CURRENT_QUALITY=0; blackside_state=1; bp_video_offset_131773=723849023477252100; CURRENT_FNVAL=16; innersign=0; SESSDATA=378de8a5,1683528686,11a4d*b2; bili_jct=cb8b96e31d5300c2d4412b4415a54182; sid=ojy6c7g8"
+        raw_cookie_line = "buvid3=F87F0A11-46CF-848D-6DFF-E8A6FF7060A766081infoc; rpdid=|(J|~ukYY|~)0J'uYYY~lYYY~; buvid_fp=F87F0A11-46CF-848D-6DFF-E8A6FF7060A766081infoc; buvid_fp_plain=undefined; DedeUserID=131773; DedeUserID__ckMd5=54f906a0afc0ce2c; i-wanna-go-back=-1; b_ut=5; nostalgia_conf=-1; hit-dyn-v2=1; buvid4=null; fingerprint=c1b65158bb87079465a8da1e534826d0; CURRENT_QUALITY=0; blackside_state=1; CURRENT_BLACKGAP=0; hit-new-style-dyn=0; LIVE_BUVID=AUTO2216679860727315; CURRENT_FNVAL=4048; b_nut=1667998963; bp_video_offset_131773=726799820602212400; SESSDATA=c0247c7b,1683615373,c1b5c*b2; bili_jct=c08190c2264f57eadcd3d167da26a4e7; sid=5csjyoal; innersign=0"
         simple_cookie = http.cookies.SimpleCookie(raw_cookie_line)
         cookie_jar = requests.cookies.RequestsCookieJar()
         cookie_jar.update(simple_cookie)
