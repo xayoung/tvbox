@@ -178,7 +178,7 @@ class Spider(Spider):  # 元类 默认的元类 type
     def detailContent(self,array):
         aid = array[0]
         type = array[4]
-        if type :
+        if type == 1:
             url = "http://api.bilibili.com/pgc/view/web/season?season_id={0}".format(aid)
             rsp = self.fetch(url,headers=self.header)
             jRoot = json.loads(rsp.text)
